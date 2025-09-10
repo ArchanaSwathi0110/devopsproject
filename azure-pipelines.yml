@@ -4,64 +4,45 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-
 - main
 
-
-pool: devlab2
-
+pool: thamizhnila 
 
 steps:
-
 - script: echo "Stage 1 - Setting up Java version."
 
-- task: Maven@3
-
+- task: MavenToolInstaller@1
   inputs:
+    versionSpec: '3.x'
+    installationDirectory: $(Agent.ToolsDirectory)/maven
 
+- task: Maven@3
+  inputs:
+    mavenHome: '$(Agent.ToolsDirectory)/maven'
     mavenPomFile: 'pom.xml'
-
     mavenOptions: '-Xmx3072m'
-
     javaHomeOption: 'JDKVersion'
-
     jdkArchitectureOption: 'x64'
-
+    jdkVersionOption: '1.8'  # Specify JDK version, adjust accordingly
     publishJUnitResults: true
-
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-
     goals: 'package'
-
 
 - script: echo "Stage 2 - Maven build and test completed successfully."
 
-
 - task: PublishBuildArtifacts@1
-
   inputs:
-
     PathtoPublish: '$(System.DefaultWorkingDirectory)/target'
-
     ArtifactName: 'my-java-artifacts'
-
     publishLocation: 'container'
-
 
 - script: echo "Stage 3 - Artifacts published successfully."
 
-
 - task: PublishTestResults@2
-
   inputs:
-
     testResultsFormat: 'JUnit'
-
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-
     failTaskOnFailedTests: true
-
     searchFolder: '$(System.DefaultWorkingDirectory)'
 
-
-- script: echo "Regression test is successfully completed.”
+- script: echo "Regression test is successfully completed."
